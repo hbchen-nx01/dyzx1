@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { BookOpen, Plus, Edit, Trash2, Download, Search, X } from 'lucide-react';
-import { TrainingPlan } from '@/types';
+import { TrainingPlan, Personnel } from '@/types';
 import { exportToExcel, formatDate, formatDateTime } from '@/lib/utils';
 import Navbar from '@/components/Navbar';
 
@@ -12,6 +12,7 @@ export default function TrainingPlans() {
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingPlan, setEditingPlan] = useState<TrainingPlan | null>(null);
+  const [personnel, setPersonnel] = useState<Personnel[]>([]);
   const [formData, setFormData] = useState({
     planNumber: '',
     title: '',
@@ -29,6 +30,7 @@ export default function TrainingPlans() {
 
   useEffect(() => {
     fetchPlans();
+    fetchPersonnel();
   }, []);
 
   const fetchPlans = async () => {
@@ -41,8 +43,26 @@ export default function TrainingPlans() {
     }
   };
 
+  const fetchPersonnel = async () => {
+    try {
+      const response = await fetch('/api/personnel');
+      const data = await response.json();
+      setPersonnel(data);
+    } catch (error) {
+      console.error('Failed to fetch personnel:', error);
+    }
+  };
+
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
+  };
+
+  const handleTrainerChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedTrainerName = e.target.value;
+    setFormData({
+      ...formData,
+      trainer: selectedTrainerName,
+    });
   };
 
   const filteredPlans = plans.filter(
@@ -371,13 +391,19 @@ export default function TrainingPlans() {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">培训师 *</label>
-                    <input
-                      type="text"
+                    <select
                       required
                       value={formData.trainer}
-                      onChange={(e) => setFormData({ ...formData, trainer: e.target.value })}
+                      onChange={handleTrainerChange}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
-                    />
+                    >
+                      <option value="">请选择培训师</option>
+                      {personnel.map((person) => (
+                        <option key={person.id} value={person.name}>
+                          {person.name}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">地点 *</label>

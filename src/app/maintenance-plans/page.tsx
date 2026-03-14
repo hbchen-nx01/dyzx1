@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Clock, Plus, Edit, Trash2, Upload, Download, Search, X } from 'lucide-react';
-import { MaintenancePlan, Instrument } from '@/types';
+import { MaintenancePlan, Instrument, Personnel } from '@/types';
 import { exportToExcel, importFromExcel, formatDate, formatDateTime } from '@/lib/utils';
 import Navbar from '@/components/Navbar';
 
@@ -13,6 +13,7 @@ export default function MaintenancePlans() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingPlan, setEditingPlan] = useState<MaintenancePlan | null>(null);
   const [instruments, setInstruments] = useState<Instrument[]>([]);
+  const [personnel, setPersonnel] = useState<Personnel[]>([]);
   const [formData, setFormData] = useState({
     planNumber: '',
     instrumentId: '',
@@ -32,6 +33,7 @@ export default function MaintenancePlans() {
   useEffect(() => {
     fetchPlans();
     fetchInstruments();
+    fetchPersonnel();
   }, []);
 
   const fetchPlans = async () => {
@@ -54,6 +56,16 @@ export default function MaintenancePlans() {
     }
   };
 
+  const fetchPersonnel = async () => {
+    try {
+      const response = await fetch('/api/personnel');
+      const data = await response.json();
+      setPersonnel(data);
+    } catch (error) {
+      console.error('Failed to fetch personnel:', error);
+    }
+  };
+
   const handleInstrumentTagChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedTag = e.target.value;
     const selectedInstrument = instruments.find(inst => inst.tag === selectedTag);
@@ -62,6 +74,16 @@ export default function MaintenancePlans() {
       instrumentTag: selectedTag,
       instrumentId: selectedInstrument?.id || '',
       instrumentName: selectedInstrument?.name || '',
+    });
+  };
+
+  const handleAssignedToChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedPersonnelId = e.target.value;
+    const selectedPersonnel = personnel.find(p => p.id === selectedPersonnelId);
+    setFormData({
+      ...formData,
+      assignedTo: selectedPersonnelId,
+      assignedToName: selectedPersonnel?.name || '',
     });
   };
 
@@ -486,13 +508,18 @@ export default function MaintenancePlans() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">负责人</label>
-                    <input
-                      type="text"
-                      value={formData.assignedToName}
-                      onChange={(e) => setFormData({ ...formData, assignedToName: e.target.value })}
+                    <select
+                      value={formData.assignedTo}
+                      onChange={handleAssignedToChange}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder="输入负责人姓名"
-                    />
+                    >
+                      <option value="">请选择负责人</option>
+                      {personnel.map((person) => (
+                        <option key={person.id} value={person.id}>
+                          {person.name}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                 </div>
 

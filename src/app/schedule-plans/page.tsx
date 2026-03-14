@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Calendar, Plus, Edit, Trash2, Search, X } from 'lucide-react';
-import { Schedule } from '@/types';
+import { Schedule, Personnel } from '@/types';
 import { formatDate, formatDateTime } from '@/lib/utils';
 import Navbar from '@/components/Navbar';
 
@@ -12,6 +12,7 @@ export default function SchedulePlans() {
   const [dateFilter, setDateFilter] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingPlan, setEditingPlan] = useState<Schedule | null>(null);
+  const [personnel, setPersonnel] = useState<Personnel[]>([]);
   const [formData, setFormData] = useState({
     scheduleNumber: '',
     title: '',
@@ -27,6 +28,7 @@ export default function SchedulePlans() {
 
   useEffect(() => {
     fetchPlans();
+    fetchPersonnel();
   }, []);
 
   const fetchPlans = async () => {
@@ -39,12 +41,30 @@ export default function SchedulePlans() {
     }
   };
 
+  const fetchPersonnel = async () => {
+    try {
+      const response = await fetch('/api/personnel');
+      const data = await response.json();
+      setPersonnel(data);
+    } catch (error) {
+      console.error('Failed to fetch personnel:', error);
+    }
+  };
+
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
   };
 
   const handleDateFilter = (e: React.ChangeEvent<HTMLInputElement>) => {
     setDateFilter(e.target.value);
+  };
+
+  const handleOrganizerChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedOrganizerName = e.target.value;
+    setFormData({
+      ...formData,
+      organizer: selectedOrganizerName,
+    });
   };
 
   const filteredPlans = plans.filter(
@@ -365,13 +385,19 @@ export default function SchedulePlans() {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">组织者 *</label>
-                    <input
-                      type="text"
+                    <select
                       required
                       value={formData.organizer}
-                      onChange={(e) => setFormData({ ...formData, organizer: e.target.value })}
+                      onChange={handleOrganizerChange}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-indigo-500 focus:border-transparent"
-                    />
+                    >
+                      <option value="">请选择组织者</option>
+                      {personnel.map((person) => (
+                        <option key={person.id} value={person.name}>
+                          {person.name}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                   <div className="md:col-span-2">
                     <label className="block text-sm font-medium text-gray-700 mb-1">参与者 *</label>

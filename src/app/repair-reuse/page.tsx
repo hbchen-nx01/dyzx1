@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { Wrench, Plus, Edit, Trash2, Download, Search, X } from 'lucide-react';
-import { RecycleRecord } from '@/types';
+import { RecycleRecord, Personnel } from '@/types';
 import { exportToExcel, formatDate, formatDateTime } from '@/lib/utils';
 import Navbar from '@/components/Navbar';
 
@@ -11,6 +11,7 @@ export default function RepairReuse() {
   const [searchTerm, setSearchTerm] = useState('');
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingRecord, setEditingRecord] = useState<RecycleRecord | null>(null);
+  const [personnel, setPersonnel] = useState<Personnel[]>([]);
   const [formData, setFormData] = useState({
     recordNumber: '',
     itemName: '',
@@ -25,6 +26,7 @@ export default function RepairReuse() {
 
   useEffect(() => {
     fetchRecords();
+    fetchPersonnel();
   }, []);
 
   const fetchRecords = async () => {
@@ -37,8 +39,26 @@ export default function RepairReuse() {
     }
   };
 
+  const fetchPersonnel = async () => {
+    try {
+      const response = await fetch('/api/personnel');
+      const data = await response.json();
+      setPersonnel(data);
+    } catch (error) {
+      console.error('Failed to fetch personnel:', error);
+    }
+  };
+
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
+  };
+
+  const handleRepairedByChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedPersonnelName = e.target.value;
+    setFormData({
+      ...formData,
+      repairedBy: selectedPersonnelName,
+    });
   };
 
   const filteredRecords = records.filter(
@@ -345,13 +365,19 @@ export default function RepairReuse() {
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">修复人员 *</label>
-                    <input
-                      type="text"
+                    <select
                       required
                       value={formData.repairedBy}
-                      onChange={(e) => setFormData({ ...formData, repairedBy: e.target.value })}
+                      onChange={handleRepairedByChange}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-orange-500 focus:border-transparent"
-                    />
+                    >
+                      <option value="">请选择修复人员</option>
+                      {personnel.map((person) => (
+                        <option key={person.id} value={person.name}>
+                          {person.name}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">原值 *</label>

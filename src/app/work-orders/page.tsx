@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { ClipboardList, Plus, Edit, Trash2, Search, X, ArrowRight, Clock, CheckCircle, AlertCircle } from 'lucide-react';
-import { WorkOrder, Instrument } from '@/types';
+import { WorkOrder, Instrument, Personnel } from '@/types';
 import { formatDate, formatDateTime, generateOrderNumber } from '@/lib/utils';
 
 export default function WorkOrders() {
@@ -12,6 +12,7 @@ export default function WorkOrders() {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingOrder, setEditingOrder] = useState<WorkOrder | null>(null);
   const [instruments, setInstruments] = useState<Instrument[]>([]);
+  const [personnel, setPersonnel] = useState<Personnel[]>([]);
   const [formData, setFormData] = useState({
     orderNumber: '',
     instrumentId: '',
@@ -31,6 +32,7 @@ export default function WorkOrders() {
   useEffect(() => {
     fetchWorkOrders();
     fetchInstruments();
+    fetchPersonnel();
   }, []);
 
   const fetchWorkOrders = async () => {
@@ -53,6 +55,16 @@ export default function WorkOrders() {
     }
   };
 
+  const fetchPersonnel = async () => {
+    try {
+      const response = await fetch('/api/personnel');
+      const data = await response.json();
+      setPersonnel(data);
+    } catch (error) {
+      console.error('Failed to fetch personnel:', error);
+    }
+  };
+
   const handleInstrumentTagChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const selectedTag = e.target.value;
     const selectedInstrument = instruments.find(inst => inst.tag === selectedTag);
@@ -62,6 +74,16 @@ export default function WorkOrders() {
       instrumentId: selectedInstrument?.id || '',
       instrumentName: selectedInstrument?.name || '',
       instrumentLocation: selectedInstrument?.location || '',
+    });
+  };
+
+  const handleAssignedToChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+    const selectedPersonnelId = e.target.value;
+    const selectedPersonnel = personnel.find(p => p.id === selectedPersonnelId);
+    setFormData({
+      ...formData,
+      assignedTo: selectedPersonnelId,
+      assignedToName: selectedPersonnel?.name || '',
     });
   };
 
@@ -448,13 +470,18 @@ export default function WorkOrders() {
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">负责人</label>
-                    <input
-                      type="text"
-                      value={formData.assignedToName}
-                      onChange={(e) => setFormData({ ...formData, assignedToName: e.target.value })}
+                    <select
+                      value={formData.assignedTo}
+                      onChange={handleAssignedToChange}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                      placeholder="输入负责人姓名"
-                    />
+                    >
+                      <option value="">请选择负责人</option>
+                      {personnel.map((person) => (
+                        <option key={person.id} value={person.id}>
+                          {person.name}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                   <div>
                     <label className="block text-sm font-medium text-gray-700 mb-1">状态 *</label>
