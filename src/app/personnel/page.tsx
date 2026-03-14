@@ -18,6 +18,9 @@ export default function PersonnelManagement() {
     employeeId: '',
     department: '',
     team: '',
+    position: '',
+    education: '',
+    graduationSchool: '',
     skillLevel: '',
     phone: '',
     email: '',
@@ -61,6 +64,9 @@ export default function PersonnelManagement() {
         employeeId: personnel.employeeId,
         department: personnel.department,
         team: personnel.team,
+        position: personnel.position,
+        education: personnel.education,
+        graduationSchool: personnel.graduationSchool,
         skillLevel: personnel.skillLevel,
         phone: personnel.phone,
         email: personnel.email,
@@ -76,6 +82,9 @@ export default function PersonnelManagement() {
         employeeId: '',
         department: '',
         team: '',
+        position: '',
+        education: '',
+        graduationSchool: '',
         skillLevel: '',
         phone: '',
         email: '',
@@ -160,6 +169,10 @@ export default function PersonnelManagement() {
       姓名: p.name,
       工号: p.employeeId,
       部门: p.department,
+      班组: p.team,
+      岗位: p.position,
+      学历: p.education,
+      毕业院校: p.graduationSchool,
       技能等级: p.skillLevel,
       电话: p.phone,
       邮箱: p.email,
@@ -184,7 +197,10 @@ export default function PersonnelManagement() {
             name: row['姓名'] || '',
             employeeId: row['工号'] || '',
             department: row['部门'] || '',
-            position: row['职位'] || '',
+            team: row['班组'] || '',
+            position: row['岗位'] || row['职位'] || '',
+            education: row['学历'] || '',
+            graduationSchool: row['毕业院校'] || '',
             phone: row['电话'] || '',
             email: row['邮箱'] || '',
             hireDate: row['入职日期'] || new Date().toISOString().split('T')[0],
@@ -257,6 +273,9 @@ export default function PersonnelManagement() {
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">工号</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">部门</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">班组</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">岗位</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">学历</th>
+                  <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">毕业院校</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">技能等级</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">电话</th>
                   <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">状态</th>
@@ -287,10 +306,13 @@ export default function PersonnelManagement() {
                         </div>
                       )}
                     </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">{person.name}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-900">{person.name}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{person.employeeId}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{person.department}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{person.team}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{person.position}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{person.education}</td>
+                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{person.graduationSchool}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{person.skillLevel}</td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">{person.phone}</td>
                     <td className="px-6 py-4 whitespace-nowrap">
@@ -401,6 +423,44 @@ export default function PersonnelManagement() {
                       required
                       value={formData.team}
                       onChange={(e) => setFormData({ ...formData, team: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">岗位 *</label>
+                    <input
+                      type="text"
+                      required
+                      value={formData.position}
+                      onChange={(e) => setFormData({ ...formData, position: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">学历 *</label>
+                    <select
+                      required
+                      value={formData.education}
+                      onChange={(e) => setFormData({ ...formData, education: e.target.value })}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                    >
+                      <option value="">请选择学历</option>
+                      <option value="小学">小学</option>
+                      <option value="初中">初中</option>
+                      <option value="高中">高中</option>
+                      <option value="大专">大专</option>
+                      <option value="本科">本科</option>
+                      <option value="硕士">硕士</option>
+                      <option value="博士">博士</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">毕业院校 *</label>
+                    <input
+                      type="text"
+                      required
+                      value={formData.graduationSchool}
+                      onChange={(e) => setFormData({ ...formData, graduationSchool: e.target.value })}
                       className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
                     />
                   </div>
@@ -545,6 +605,18 @@ export default function PersonnelManagement() {
                 <div>
                   <p className="text-sm font-medium text-gray-500">班组</p>
                   <p className="text-gray-900">{selectedPersonnel.team}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">岗位</p>
+                  <p className="text-gray-900">{selectedPersonnel.position}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">学历</p>
+                  <p className="text-gray-900">{selectedPersonnel.education}</p>
+                </div>
+                <div>
+                  <p className="text-sm font-medium text-gray-500">毕业院校</p>
+                  <p className="text-gray-900">{selectedPersonnel.graduationSchool}</p>
                 </div>
                 <div>
                   <p className="text-sm font-medium text-gray-500">技能等级</p>

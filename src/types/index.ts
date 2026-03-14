@@ -4,6 +4,9 @@ export interface Personnel {
   employeeId: string;
   department: string;
   team: string;
+  position: string;
+  education: string;
+  graduationSchool: string;
   skillLevel: string;
   phone: string;
   email: string;
