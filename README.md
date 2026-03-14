@@ -1,4 +1,4 @@
-# 仪表班组管理系统V1.0
+# 班组管理系统V1.0
 
 基于 Next.js 14 + TypeScript + Tailwind CSS 构建。
 
