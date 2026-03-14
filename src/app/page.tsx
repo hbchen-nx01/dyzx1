@@ -50,6 +50,7 @@ export default function Home() {
         <div className="max-w-7xl mx-auto px-4 py-6 flex items-center justify-between">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">仪表班组管理系统V1.0</h1>
+            <p className="text-gray-600 mt-1">作者：陈海兵</p>
           </div>
           <button
             onClick={() => router.push('/')}
@@ -69,13 +70,15 @@ export default function Home() {
               <button
                 key={module.id}
                 onClick={() => handleModuleClick(module.route)}
-                className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 p-6 text-left group hover:scale-105 cursor-pointer"
+                className="bg-white rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 p-4 text-left group hover:scale-105 cursor-pointer flex items-start gap-4"
               >
-                <div className="flex items-center justify-center w-12 h-12 bg-blue-100 rounded-lg mb-4 group-hover:bg-blue-200 transition-colors">
-                  <Icon className="w-6 h-6 text-blue-600" />
+                <div className="flex items-center justify-center w-10 h-10 bg-blue-100 rounded-lg group-hover:bg-blue-200 transition-colors flex-shrink-0">
+                  <Icon className="w-5 h-5 text-blue-600" />
                 </div>
-                <h3 className="text-lg font-semibold text-gray-900 mb-2">{module.name}</h3>
-                <p className="text-sm text-gray-600">{module.description}</p>
+                <div className="flex-1">
+                  <h3 className="text-lg font-semibold text-gray-900 mb-1">{module.name}</h3>
+                  <p className="text-sm text-gray-600">{module.description}</p>
+                </div>
               </button>
             );
           })}
