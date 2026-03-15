@@ -37,3 +37,5 @@ yarn.lock
 pnpm-lock.yaml
 .vercel
 .env*.local
+
+/src/generated/prisma

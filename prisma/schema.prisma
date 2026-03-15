@@ -1,0 +1,15 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// 定义用户表结构
+model User {
+  id    String @id @default(cuid())
+  name  String
+  email String @unique
+  createdAt DateTime @default(now())
+}
